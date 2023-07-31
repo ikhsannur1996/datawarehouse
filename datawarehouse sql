@@ -53,12 +53,6 @@ INSERT INTO stg.stg_sales_transaction (transaction_id,sale_date,customer_id,cust
 	 (29,'2023-07-19',1004,'Emily Davis','321 Maple St, Jakarta','084567890123','emilydavis@example.com',2003,'Jeans','Apparel',40.00,3,120.00),
 	 (30,'2023-07-20',1001,'John Doe','123 Main St, Jakarta','081234567890','johndoe@example.com',2002,'Shoes','Footwear',50.00,1,50.00);
 
-	
--- dwh.fact_sales_transaction definition
-
--- Drop table
-
--- DROP TABLE dwh.fact_sales_transaction;
 
 -- Create dwh.dim_customers table
 CREATE TABLE dwh.dim_customers (
