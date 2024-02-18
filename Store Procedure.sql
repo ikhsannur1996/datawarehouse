@@ -80,6 +80,7 @@ CALL dwh.generate_dwh();
 -- Update new data into public.sales_transaction table
 UPDATE public.sales_transaction
 SET 
+    sale_date = '2023-11-12',
     product_price = 1800,
     quantity = 3,
     sales_amount = 5400
