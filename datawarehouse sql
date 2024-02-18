@@ -170,7 +170,7 @@ CREATE TABLE dwh.dim_products (
 
 -- Create dwh.fact_sales_transaction table
 CREATE TABLE dwh.fact_sales_transaction (
-    transaction_id int4 PRIMARY KEY,
+    transaction_id int4,
     customer_id int4,
     product_id int4,
     sale_date date,
