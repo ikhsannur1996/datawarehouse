@@ -76,3 +76,11 @@ VALUES
 
 -- Calling the stored procedure to generate the data warehouse
 CALL dwh.generate_dwh();
+
+-- Update new data into public.sales_transaction table
+UPDATE public.sales_transaction
+SET 
+    product_price = 1800,
+    quantity = 3,
+    sales_amount = 5400
+WHERE transaction_id = 32;
