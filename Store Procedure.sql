@@ -1,6 +1,6 @@
 -- Sample Store Procedure
 CREATE OR REPLACE PROCEDURE dwh.generate_dwh()
- LANGUAGE plpgsql
+LANGUAGE plpgsql
 AS $procedure$
 BEGIN
     -- Step 1: Truncate and Insert into stg
@@ -8,8 +8,8 @@ BEGIN
     TRUNCATE TABLE stg.stg_sales_transaction;
     INSERT INTO stg.stg_sales_transaction 
     SELECT * FROM public.sales_transaction;
-	
-	-- Step 2: Insert into dim_products
+    
+    -- Step 2: Insert into dim_products
     -- Description: Insert new product data into the product dimension if they don't already exist.
     INSERT INTO dwh.dim_products
         (product_id, product_name, product_category, product_price)
@@ -18,7 +18,7 @@ BEGIN
     FROM
         stg.stg_sales_transaction AS src
     LEFT JOIN dwh.dim_products AS dim ON
-        COALESCE(dim.product_id, 0) = COALESCE(src.product_id, 0)
+        dim.product_id = src.product_id
     WHERE dim.product_id IS NULL;
 
     -- Step 3: Insert into dim_customers
@@ -30,42 +30,58 @@ BEGIN
     FROM
         stg.stg_sales_transaction AS src
     LEFT JOIN dwh.dim_customers AS dim ON
-        COALESCE(dim.customer_id, 0) = COALESCE(src.customer_id, 0)
+        dim.customer_id = src.customer_id
     WHERE dim.customer_id IS NULL;
 
     -- Step 4: Insert into fact
     -- Description: Insert new sales transactions into the fact table if they don't already exist.
     INSERT INTO dwh.fact_sales_transaction
         (transaction_id, customer_id, product_id, sale_date, quantity, sales_amount)
-    SELECT
-        src.transaction_id, src.customer_id, src.product_id, src.sale_date, src.quantity, src.sales_amount
-    FROM
-        stg.stg_sales_transaction AS src
-    LEFT JOIN dwh.fact_sales_transaction AS fact ON
-        COALESCE(fact.transaction_id, 0) = COALESCE(src.transaction_id, 0) AND
-        COALESCE(fact.customer_id, 0) = COALESCE(src.customer_id, 0) AND
-        COALESCE(fact.product_id, 0) = COALESCE(src.product_id, 0) AND
-        COALESCE(fact.sale_date, current_date) = COALESCE(src.sale_date, current_date) AND
-        COALESCE(fact.quantity, 0) = COALESCE(src.quantity, 0) AND
-        COALESCE(fact.sales_amount, 0) = COALESCE(src.sales_amount, 0)
-    WHERE fact.transaction_id IS NULL;
+	SELECT
+		src.transaction_id, src.customer_id, src.product_id, src.sale_date, src.quantity, src.sales_amount
+	FROM
+		stg.stg_sales_transaction AS src 
+	WHERE NOT EXISTS (
+		SELECT 1
+		FROM dwh.fact_sales_transaction AS fact
+		WHERE 
+			COALESCE(fact.transaction_id, 0) = COALESCE(src.transaction_id, 0) AND
+			COALESCE(fact.customer_id, 0) = COALESCE(src.customer_id, 0) AND
+			COALESCE(fact.product_id, 0) = COALESCE(src.product_id, 0) AND
+			COALESCE(fact.sale_date, current_date) = COALESCE(src.sale_date, current_date) AND
+			COALESCE(fact.quantity, 0) = COALESCE(src.quantity, 0) AND
+			COALESCE(fact.sales_amount, 0) = COALESCE(src.sales_amount, 0)
+	);
+
 
     -- Step 5: Truncate and Insert into dm_sales_transaction
     -- Description: Populate the data mart with the latest sales transactions.
     TRUNCATE TABLE dm.dm_sales_transaction;
     INSERT INTO dm.dm_sales_transaction 
         (transaction_id, sale_date, customer_name, product_name, quantity, sales_amount)
-    SELECT 
-        f.transaction_id, f.sale_date, c.customer_name, p.product_name, f.quantity, f.sales_amount
-    FROM 
-        dwh.fact_sales_transaction AS f
-    LEFT JOIN 
-        dwh.dim_products AS p ON f.product_id = p.product_id
-    LEFT JOIN 
-        dwh.dim_customers AS c ON f.customer_id = c.customer_id;
-
+    SELECT
+        transaction_id, sale_date, customer_name, product_name, quantity, sales_amount
+    FROM (
+        SELECT 
+            f.transaction_id, 
+            f.sale_date, 
+            c.customer_name, 
+            p.product_name, 
+            f.quantity, 
+            f.sales_amount,
+            ROW_NUMBER() OVER (PARTITION BY f.transaction_id ORDER BY f.sale_date DESC) AS data_update
+        FROM 
+            dwh.fact_sales_transaction AS f
+        LEFT JOIN 
+            dwh.dim_products AS p ON f.product_id = p.product_id
+        LEFT JOIN 
+            dwh.dim_customers AS c ON f.customer_id = c.customer_id
+    ) AS subquery
+    WHERE data_update = 1;
+    
 END;
 $procedure$;
+
 
 
 -- Inserting new data into public.sales_transaction table
@@ -80,7 +96,7 @@ CALL dwh.generate_dwh();
 -- Update new data into public.sales_transaction table
 UPDATE public.sales_transaction
 SET 
-    sale_date = '2023-11-12',
+	sale_date = '2023-11-12',
     product_price = 1800,
     quantity = 3,
     sales_amount = 5400
