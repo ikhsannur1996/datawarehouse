@@ -9,29 +9,32 @@ BEGIN
     INSERT INTO stg.stg_sales_transaction 
     SELECT * FROM public.sales_transaction;
     
-    -- Step 2: Insert into dim_products
-    -- Description: Insert new product data into the product dimension if they don't already exist.
-    INSERT INTO dwh.dim_products
-        (product_id, product_name, product_category, product_price)
-    SELECT
-        src.product_id, src.product_name, src.product_category, src.product_price
-    FROM
-        stg.stg_sales_transaction AS src
-    LEFT JOIN dwh.dim_products AS dim ON
-        dim.product_id = src.product_id
-    WHERE dim.product_id IS NULL;
+    -- Step 2: Insert or update into dim_products
+-- Description: Insert new product data into the product dimension if they don't already exist.
+--             Update existing product data if they already exist.
+INSERT INTO dwh.dim_products
+    (product_id, product_name, product_category, product_price)
+VALUES
+    (src.product_id, src.product_name, src.product_category, src.product_price)
+ON CONFLICT (product_id) DO UPDATE
+    SET 
+        product_name = EXCLUDED.product_name,
+        product_category = EXCLUDED.product_category,
+        product_price = EXCLUDED.product_price;
 
-    -- Step 3: Insert into dim_customers
-    -- Description: Insert new customer data into the customer dimension if they don't already exist.
-    INSERT INTO dwh.dim_customers
-        (customer_id, customer_name, customer_address, customer_phone, customer_email)
-    SELECT
-        src.customer_id, src.customer_name, src.customer_address, src.customer_phone, src.customer_email
-    FROM
-        stg.stg_sales_transaction AS src
-    LEFT JOIN dwh.dim_customers AS dim ON
-        dim.customer_id = src.customer_id
-    WHERE dim.customer_id IS NULL;
+-- Step 3: Insert or update into dim_customers
+-- Description: Insert new customer data into the customer dimension if they don't already exist.
+--             Update existing customer data if they already exist.
+INSERT INTO dwh.dim_customers
+    (customer_id, customer_name, customer_address, customer_phone, customer_email)
+VALUES
+    (src.customer_id, src.customer_name, src.customer_address, src.customer_phone, src.customer_email)
+ON CONFLICT (customer_id) DO UPDATE
+    SET 
+        customer_name = EXCLUDED.customer_name,
+        customer_address = EXCLUDED.customer_address,
+        customer_phone = EXCLUDED.customer_phone,
+        customer_email = EXCLUDED.customer_email;
 
     -- Step 4: Insert into fact
     -- Description: Insert new sales transactions into the fact table if they don't already exist.
@@ -81,7 +84,6 @@ BEGIN
     
 END;
 $procedure$;
-
 
 
 -- Inserting new data into public.sales_transaction table
