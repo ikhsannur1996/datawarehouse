@@ -5,6 +5,7 @@ AS $procedure$
 BEGIN
     -- Step 1: Truncate and Insert into stg
     -- Description: Clear the staging table and populate it with data from the source table.
+    CREATE TABLE IF NOT EXISTS AS SELECT * FROM public.sales_transaction;
     TRUNCATE TABLE stg.stg_sales_transaction;
     INSERT INTO stg.stg_sales_transaction 
     SELECT * FROM public.sales_transaction;
