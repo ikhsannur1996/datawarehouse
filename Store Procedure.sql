@@ -36,9 +36,9 @@ BEGIN
     -- Step 4: Insert into fact
     -- Description: Insert new sales transactions into the fact table if they don't already exist.
     INSERT INTO dwh.fact_sales_transaction
-        (transaction_id, customer_id, product_id, sale_date, quantity, sales_amount)
+        (transaction_id, customer_id, product_id, sales_date, quantity, sales_amount)
 	SELECT
-		src.transaction_id, src.customer_id, src.product_id, src.sale_date, src.quantity, src.sales_amount
+		src.transaction_id, src.customer_id, src.product_id, src.sales_date, src.quantity, src.sales_amount
 	FROM
 		stg.stg_sales_transaction AS src 
 	WHERE NOT EXISTS (
@@ -48,7 +48,7 @@ BEGIN
 			COALESCE(fact.transaction_id, 0) = COALESCE(src.transaction_id, 0) AND
 			COALESCE(fact.customer_id, 0) = COALESCE(src.customer_id, 0) AND
 			COALESCE(fact.product_id, 0) = COALESCE(src.product_id, 0) AND
-			COALESCE(fact.sale_date, current_date) = COALESCE(src.sale_date, current_date) AND
+			COALESCE(fact.sales_date, current_date) = COALESCE(src.sales_date, current_date) AND
 			COALESCE(fact.quantity, 0) = COALESCE(src.quantity, 0) AND
 			COALESCE(fact.sales_amount, 0) = COALESCE(src.sales_amount, 0)
 	);
@@ -58,18 +58,18 @@ BEGIN
     -- Description: Populate the data mart with the latest sales transactions.
     TRUNCATE TABLE dm.dm_sales_transaction;
     INSERT INTO dm.dm_sales_transaction 
-        (transaction_id, sale_date, customer_name, product_name, quantity, sales_amount)
+        (transaction_id, sales_date, customer_name, product_name, quantity, sales_amount)
     SELECT
-        transaction_id, sale_date, customer_name, product_name, quantity, sales_amount
+        transaction_id, sales_date, customer_name, product_name, quantity, sales_amount
     FROM (
         SELECT 
             f.transaction_id, 
-            f.sale_date, 
+            f.sales_date, 
             c.customer_name, 
             p.product_name, 
             f.quantity, 
             f.sales_amount,
-            ROW_NUMBER() OVER (PARTITION BY f.transaction_id ORDER BY f.sale_date DESC) AS data_update
+            ROW_NUMBER() OVER (PARTITION BY f.transaction_id ORDER BY f.sales_date DESC) AS data_update
         FROM 
             dwh.fact_sales_transaction AS f
         LEFT JOIN 
@@ -86,7 +86,7 @@ $procedure$;
 
 -- Inserting new data into public.sales_transaction table
 INSERT INTO public.sales_transaction(
-    transaction_id, sale_date, customer_id, customer_name, customer_address, customer_phone, customer_email, product_id, product_name, product_category, product_price, quantity, sales_amount)
+    transaction_id, sales_date, customer_id, customer_name, customer_address, customer_phone, customer_email, product_id, product_name, product_category, product_price, quantity, sales_amount)
 VALUES 
     (32, '2023-11-11', 1006, 'Mohamad Ikhsan Nurulloh', 'Jakarta', '0833231431', 'ikhsan@gmail.com', 2006, 'Laptop', 'Laptop', 1500, 2, 3000);
 
@@ -96,8 +96,7 @@ CALL dwh.generate_dwh();
 -- Update new data into public.sales_transaction table
 UPDATE public.sales_transaction
 SET 
-	sale_date = '2023-11-12',
-    product_price = 1800,
-    quantity = 3,
-    sales_amount = 5400
+    sales_date = '2023-11-12',
+    quantity = 4,
+    sales_amount = 6000
 WHERE transaction_id = 32;
