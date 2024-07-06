@@ -77,7 +77,7 @@ BEGIN
         LEFT JOIN 
             dwh.dim_customers AS c ON f.customer_id = c.customer_id
     ) AS subquery
-    WHERE data_update = 1;
+    WHERE data_update = 1 and transaction_id IN (SELECT distinct transaction_id from stg.stg_sales_transaction);
     
 END;
 $procedure$;
