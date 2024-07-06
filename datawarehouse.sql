@@ -46,7 +46,7 @@ $$;
 
 CREATE TABLE public.sales_transaction (
 	transaction_id int4 NULL,
-	sale_date date NULL,
+	sales_date date NULL,
 	customer_id int4 NULL,
 	customer_name varchar(100) NULL,
 	customer_address varchar(200) NULL,
@@ -61,7 +61,7 @@ CREATE TABLE public.sales_transaction (
 );
 
 
-INSERT INTO public.sales_transaction (transaction_id,sale_date,customer_id,customer_name,customer_address,customer_phone,customer_email,product_id,product_name,product_category,product_price,quantity,sales_amount) VALUES
+INSERT INTO public.sales_transaction (transaction_id,sales_date,customer_id,customer_name,customer_address,customer_phone,customer_email,product_id,product_name,product_category,product_price,quantity,sales_amount) VALUES
 	 (1,'2023-07-05',1003,'David Johnson','789 Oak St, Jakarta','083456789012','davidjohnson@example.com',2003,'Jeans','Apparel',40.00,2,80.00),
 	 (2,'2023-07-05',1002,'Jane Smith','456 Elm St, Jakarta','082345678901','janesmith@example.com',2001,'Shirt','Apparel',25.00,1,25.00),
 	 (3,'2023-07-06',1005,'Michael Wilson','654 Pine St, Jakarta','085678901234','michaelwilson@example.com',2004,'Watch','Accessories',100.00,3,300.00),
@@ -103,7 +103,7 @@ INSERT INTO public.sales_transaction (transaction_id,sale_date,customer_id,custo
 
 CREATE TABLE stg.stg_sales_transaction (
 	transaction_id int4 NULL,
-	sale_date date NULL,
+	sales_date date NULL,
 	customer_id int4 NULL,
 	customer_name varchar(100) NULL,
 	customer_address varchar(200) NULL,
@@ -118,7 +118,7 @@ CREATE TABLE stg.stg_sales_transaction (
 );
 
 
-INSERT INTO stg.stg_sales_transaction (transaction_id,sale_date,customer_id,customer_name,customer_address,customer_phone,customer_email,product_id,product_name,product_category,product_price,quantity,sales_amount) VALUES
+INSERT INTO stg.stg_sales_transaction (transaction_id,sales_date,customer_id,customer_name,customer_address,customer_phone,customer_email,product_id,product_name,product_category,product_price,quantity,sales_amount) VALUES
 	 (1,'2023-07-05',1003,'David Johnson','789 Oak St, Jakarta','083456789012','davidjohnson@example.com',2003,'Jeans','Apparel',40.00,2,80.00),
 	 (2,'2023-07-05',1002,'Jane Smith','456 Elm St, Jakarta','082345678901','janesmith@example.com',2001,'Shirt','Apparel',25.00,1,25.00),
 	 (3,'2023-07-06',1005,'Michael Wilson','654 Pine St, Jakarta','085678901234','michaelwilson@example.com',2004,'Watch','Accessories',100.00,3,300.00),
@@ -173,7 +173,7 @@ CREATE TABLE dwh.fact_sales_transaction (
     transaction_id int4,
     customer_id int4,
     product_id int4,
-    sale_date date,
+    sales_date date,
     quantity int4,
     sales_amount numeric,
     FOREIGN KEY (customer_id) REFERENCES dwh.dim_customers(customer_id),
@@ -197,7 +197,7 @@ INSERT INTO dwh.dim_products (product_id,product_name,product_category,product_p
 	 (2004,'Watch','Accessories',100.00),
 	 (2005,'Hat','Accessories',15.00);
 
-INSERT INTO dwh.fact_sales_transaction (transaction_id,customer_id,product_id,sale_date,quantity,sales_amount) VALUES
+INSERT INTO dwh.fact_sales_transaction (transaction_id,customer_id,product_id,sales_date,quantity,sales_amount) VALUES
 	 (1,1003,2003,'2023-07-05',2,80.00),
 	 (2,1002,2001,'2023-07-05',1,25.00),
 	 (3,1005,2004,'2023-07-06',3,300.00),
@@ -238,14 +238,14 @@ INSERT INTO dwh.fact_sales_transaction (transaction_id,customer_id,product_id,sa
 
 CREATE TABLE dm.dm_sales_transaction (
 	transaction_id int4 NULL,
-	sale_date date NULL,
+	sales_date date NULL,
 	customer_name varchar(100) NULL,
 	product_name varchar(100) NULL,
 	quantity int4 NULL,
 	sales_amount numeric NULL
 );
 
-INSERT INTO dm.dm_sales_transaction (transaction_id,sale_date,customer_name,product_name,quantity,sales_amount) VALUES
+INSERT INTO dm.dm_sales_transaction (transaction_id,sales_date,customer_name,product_name,quantity,sales_amount) VALUES
 	 (21,'2023-07-15','David Johnson','Jeans',2,80.00),
 	 (22,'2023-07-16','Jane Smith','Shirt',1,25.00),
 	 (23,'2023-07-16','Michael Wilson','Shoes',2,100.00),
