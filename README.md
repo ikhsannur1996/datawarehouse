@@ -5,7 +5,7 @@
 The staging table `stg.stg_sales_transaction` is used to store raw data coming from the source system without any transformation. It contains information about sales transactions, including details about customers, products, and sales amounts. The table has the following columns:
 
 - `transaction_id`: The identifier for each sales transaction (integer).
-- `sale_date`: The date of the sales transaction (date).
+- `sales_date`: The date of the sales transaction (date).
 - `customer_id`: The identifier of the customer associated with the transaction (integer).
 - `customer_name`: The name of the customer (varchar).
 - `customer_address`: The address of the customer (varchar).
@@ -46,7 +46,7 @@ The `dwh.fact_sales_transaction` table serves as the central fact table that sto
 - `transaction_id`: The identifier for each sales transaction (integer) - Primary Key.
 - `customer_id`: The identifier of the customer associated with the transaction (integer) - Foreign Key to `dwh.dim_customers`.
 - `product_id`: The identifier of the product associated with the transaction (integer) - Foreign Key to `dwh.dim_products`.
-- `sale_date`: The date of the sales transaction (date).
+- `sales_date`: The date of the sales transaction (date).
 - `quantity`: The quantity of the product sold in the transaction (integer).
 - `sales_amount`: The total sales amount for the transaction (numeric).
 
@@ -55,7 +55,7 @@ The `dwh.fact_sales_transaction` table serves as the central fact table that sto
 The `dm.dm_sales_transaction` table represents a data mart that stores denormalized and pre-aggregated data for sales transactions. It contains the following columns:
 
 - `transaction_id`: The identifier for each sales transaction (integer).
-- `sale_date`: The date of the sales transaction (date).
+- `sales_date`: The date of the sales transaction (date).
 - `customer_name`: The name of the customer associated with the transaction (varchar).
 - `product_name`: The name of the product associated with the transaction (varchar).
 - `quantity`: The quantity of the product sold in the transaction (integer).
