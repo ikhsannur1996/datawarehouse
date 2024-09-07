@@ -45,19 +45,19 @@ $$;
 -- DROP TABLE public.sales_transaction;
 
 CREATE TABLE public.sales_transaction (
-	transaction_id int4 NULL,
-	sales_date date NULL,
-	customer_id int4 NULL,
-	customer_name varchar(100) NULL,
-	customer_address varchar(200) NULL,
-	customer_phone varchar(20) NULL,
-	customer_email varchar(100) NULL,
-	product_id int4 NULL,
-	product_name varchar(100) NULL,
-	product_category varchar(50) NULL,
-	product_price numeric(10, 2) NULL,
-	quantity int4 NULL,
-	sales_amount numeric NULL,
+	transaction_id int4 PRIMARY KEY,
+	sales_date date,
+	customer_id int4,
+	customer_name varchar(100)L,
+	customer_address varchar(200),
+	customer_phone varchar(20),
+	customer_email varchar(100),
+	product_id int4,
+	product_name varchar(100),
+	product_category varchar(50),
+	product_price numeric(10, 2),
+	quantity int4,
+	sales_amount numeric,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -103,19 +103,19 @@ INSERT INTO public.sales_transaction (transaction_id,sales_date,customer_id,cust
 -- DROP TABLE stg.stg_sales_transaction;
 
 CREATE TABLE stg.stg_sales_transaction (
-	transaction_id int4 NULL,
-	sales_date date NULL,
-	customer_id int4 NULL,
-	customer_name varchar(100) NULL,
-	customer_address varchar(200) NULL,
-	customer_phone varchar(20) NULL,
-	customer_email varchar(100) NULL,
-	product_id int4 NULL,
-	product_name varchar(100) NULL,
-	product_category varchar(50) NULL,
-	product_price numeric(10, 2) NULL,
-	quantity int4 NULL,
-	sales_amount numeric NULL,
+	transaction_id int4,
+	sales_date date,
+	customer_id int4,
+	customer_name varchar(100),
+	customer_address varchar(200),
+	customer_phone varchar(20),
+	customer_email varchar(100),
+	product_id int4,
+	product_name varchar(100),
+	product_category varchar(50),
+	product_price numeric(10, 2),
+	quantity int4,
+	sales_amount numeric,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
