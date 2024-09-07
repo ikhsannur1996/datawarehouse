@@ -57,7 +57,8 @@ CREATE TABLE public.sales_transaction (
 	product_category varchar(50) NULL,
 	product_price numeric(10, 2) NULL,
 	quantity int4 NULL,
-	sales_amount numeric NULL
+	sales_amount numeric NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
@@ -114,7 +115,8 @@ CREATE TABLE stg.stg_sales_transaction (
 	product_category varchar(50) NULL,
 	product_price numeric(10, 2) NULL,
 	quantity int4 NULL,
-	sales_amount numeric NULL
+	sales_amount numeric NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
@@ -157,7 +159,8 @@ CREATE TABLE dwh.dim_customers (
     customer_name varchar(100),
     customer_address varchar(200),
     customer_phone varchar(20),
-    customer_email varchar(100)
+    customer_email varchar(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create dwh.dim_products table
@@ -165,7 +168,8 @@ CREATE TABLE dwh.dim_products (
     product_id int4 PRIMARY KEY,
     product_name varchar(100),
     product_category varchar(50),
-    product_price numeric(10, 2)
+    product_price numeric(10, 2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create dwh.fact_sales_transaction table
@@ -176,6 +180,7 @@ CREATE TABLE dwh.fact_sales_transaction (
     sales_date date,
     quantity int4,
     sales_amount numeric,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES dwh.dim_customers(customer_id),
     FOREIGN KEY (product_id) REFERENCES dwh.dim_products(product_id)
 );
@@ -242,7 +247,8 @@ CREATE TABLE dm.dm_sales_transaction (
 	customer_name varchar(100) NULL,
 	product_name varchar(100) NULL,
 	quantity int4 NULL,
-	sales_amount numeric NULL
+	sales_amount numeric NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 INSERT INTO dm.dm_sales_transaction (transaction_id,sales_date,customer_name,product_name,quantity,sales_amount) VALUES
