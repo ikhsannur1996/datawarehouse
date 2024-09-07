@@ -11,27 +11,29 @@ BEGIN
     
     -- Step 2: Insert into dim_products
     -- Description: Insert new product data into the product dimension if they don't already exist.
-    INSERT INTO dwh.dim_products
-        (product_id, product_name, product_category, product_price)
-    SELECT
-        src.product_id, src.product_name, src.product_category, src.product_price
-    FROM
-        stg.stg_sales_transaction AS src
-    LEFT JOIN dwh.dim_products AS dim ON
-        dim.product_id = src.product_id
-    WHERE dim.product_id IS NULL;
+    INSERT INTO dwh.dim_products (product_id, product_name, product_category, product_price)
+	SELECT product_id, product_name, product_category, product_price
+	FROM (select * from (
+		SELECT
+        src.product_id, src.product_name, src.product_category, src.product_price,
+        ROW_NUMBER() OVER (PARTITION BY src.product_id ORDER BY src.created_at DESC) AS data_update
+        FROM 
+            stg.stg_sales_transaction as src) sub_query
+        where data_update=1)
+	ON CONFLICT (product_id) DO UPDATE SET product_name = EXCLUDED.product_name, product_category = EXCLUDED.product_category, product_price = EXCLUDED.product_price, created_at =  CURRENT_TIMESTAMP;
 
     -- Step 3: Insert into dim_customers
     -- Description: Insert new customer data into the customer dimension if they don't already exist.
-    INSERT INTO dwh.dim_customers
-        (customer_id, customer_name, customer_address, customer_phone, customer_email)
-    SELECT
-        src.customer_id, src.customer_name, src.customer_address, src.customer_phone, src.customer_email
-    FROM
-        stg.stg_sales_transaction AS src
-    LEFT JOIN dwh.dim_customers AS dim ON
-        dim.customer_id = src.customer_id
-    WHERE dim.customer_id IS NULL;
+    INSERT INTO dwh.dim_customers (customer_id, customer_name, customer_address, customer_phone, customer_email)
+	SELECT customer_id, customer_name, customer_address, customer_phone, customer_email
+	FROM (select * from (
+		SELECT
+        src.customer_id, src.customer_name, src.customer_address, src.customer_phone, src.customer_email,
+        ROW_NUMBER() OVER (PARTITION BY src.customer_id ORDER BY src.created_at DESC) AS data_update
+        FROM 
+            stg.stg_sales_transaction as src) sub_query
+        where data_update=1)
+	ON CONFLICT (customer_id) DO UPDATE SET customer_name = EXCLUDED.customer_name, customer_address = EXCLUDED.customer_address, customer_phone = EXCLUDED.customer_phone, customer_email = EXCLUDED.customer_email, created_at =  CURRENT_TIMESTAMP;
 
     -- Step 4: Insert into fact
     -- Description: Insert new sales transactions into the fact table if they don't already exist.
@@ -69,7 +71,7 @@ BEGIN
             p.product_name, 
             f.quantity, 
             f.sales_amount,
-            ROW_NUMBER() OVER (PARTITION BY f.transaction_id ORDER BY f.sales_date DESC) AS data_update
+            ROW_NUMBER() OVER (PARTITION BY f.transaction_id ORDER BY f.created_at DESC) AS data_update
         FROM 
             dwh.fact_sales_transaction AS f
         LEFT JOIN 
@@ -81,7 +83,6 @@ BEGIN
     
 END;
 $procedure$;
-
 
 
 -- Inserting new data into public.sales_transaction table
