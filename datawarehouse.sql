@@ -48,7 +48,7 @@ CREATE TABLE public.sales_transaction (
 	transaction_id int4 PRIMARY KEY,
 	sales_date date,
 	customer_id int4,
-	customer_name varchar(100)L,
+	customer_name varchar(100),
 	customer_address varchar(200),
 	customer_phone varchar(20),
 	customer_email varchar(100),
@@ -242,12 +242,12 @@ INSERT INTO dwh.fact_sales_transaction (transaction_id,customer_id,product_id,sa
 -- DROP TABLE dm.dm_sales_transaction;
 
 CREATE TABLE dm.dm_sales_transaction (
-	transaction_id int4 NULL,
-	sales_date date NULL,
-	customer_name varchar(100) NULL,
-	product_name varchar(100) NULL,
-	quantity int4 NULL,
-	sales_amount numeric NULL,
+	transaction_id int4,
+	sales_date date,
+	customer_name varchar(100),
+	product_name varchar(100),
+	quantity int4,
+	sales_amount numeric,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
