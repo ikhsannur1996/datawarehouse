@@ -98,6 +98,6 @@ CALL dwh.generate_dwh();
 UPDATE public.sales_transaction
 SET 
     sales_date = '2023-11-12',
-    quantity = 4,
-    sales_amount = 6000
+    quantity = 10,
+    created_at =  CURRENT_TIMESTAMP
 WHERE transaction_id = 32;
