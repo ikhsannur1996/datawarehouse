@@ -70,7 +70,7 @@ BEGIN
             c.customer_name, 
             p.product_name, 
             f.quantity, 
-            f.sales_amount,
+            f.quantity * p.product_price as sales_amount,
             ROW_NUMBER() OVER (PARTITION BY f.transaction_id ORDER BY f.created_at DESC) AS data_update
         FROM 
             dwh.fact_sales_transaction AS f
