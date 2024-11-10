@@ -19,7 +19,7 @@ BEGIN
         ROW_NUMBER() OVER (PARTITION BY src.product_id ORDER BY src.created_at DESC) AS data_update
         FROM 
             stg.stg_sales_transaction as src) sub_query
-        where data_update=1)
+        where data_update=1) sub_query
 	ON CONFLICT (product_id) DO UPDATE SET product_name = EXCLUDED.product_name, product_category = EXCLUDED.product_category, product_price = EXCLUDED.product_price, created_at =  CURRENT_TIMESTAMP;
 
     -- Step 3: Insert into dim_customers
@@ -32,7 +32,7 @@ BEGIN
         ROW_NUMBER() OVER (PARTITION BY src.customer_id ORDER BY src.created_at DESC) AS data_update
         FROM 
             stg.stg_sales_transaction as src) sub_query
-        where data_update=1)
+        where data_update=1) sub_query
 	ON CONFLICT (customer_id) DO UPDATE SET customer_name = EXCLUDED.customer_name, customer_address = EXCLUDED.customer_address, customer_phone = EXCLUDED.customer_phone, customer_email = EXCLUDED.customer_email, created_at =  CURRENT_TIMESTAMP;
 
     -- Step 4: Insert into fact
